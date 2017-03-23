@@ -1072,16 +1072,14 @@ unsigned is_submodule_modified(const char *path, int ignore_untracked)
 
 	while (strbuf_getwholeline_fd(&buf, cp.out, '\n') != EOF) {
 		/* regular untracked files */
-		if (buf.buf[0] == '?') {
+		if (buf.buf[0] == '?')
 			dirty_submodule |= DIRTY_SUBMODULE_UNTRACKED;
-			if (dirty_submodule & DIRTY_SUBMODULE_MODIFIED)
-				break;
-		} else {
+		else
 			dirty_submodule |= DIRTY_SUBMODULE_MODIFIED;
-			if (ignore_untracked ||
-			    (dirty_submodule & DIRTY_SUBMODULE_UNTRACKED))
-				break;
-		}
+
+		if ((dirty_submodule & DIRTY_SUBMODULE_MODIFIED) &&
+		    ((dirty_submodule & DIRTY_SUBMODULE_UNTRACKED) || ignore_untracked))
+			break;
 	}
 	close(cp.out);
 
